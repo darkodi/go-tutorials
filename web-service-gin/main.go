@@ -26,6 +26,8 @@ func main() {
 	// this sets up an association in which getAlbums handles requests to the /albums endpoint path.
 	// in other words, use the GET function to associate the GET HTTP method and /albums path with a handler function.
 	router.GET("/albums", getAlbums)
+	// Associate the /albums/:id path with the getAlbumByID function.
+	router.GET("/albums/:id", getAlbumByID)
 	// Associate the POST method at the /albums path with the postAlbums function.
 	router.POST("/albums", postAlbums)
 	// attach the router to an http.Server and start the server.
@@ -50,4 +52,20 @@ func postAlbums(c *gin.Context) {
 	albums = append(albums, newAlbum)
 	// Add a 201 status code to the response, along with JSON representing the album you added.
 	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+// getAlbumByID locates the album whose ID value matches the id
+// parameter sent by the client, then returns that album as a response.
+func getAlbumByID(c *gin.Context) {
+	id := c.Param("id") // extract the ID in the request path
+
+	// Loop over the list of albums, looking for
+	// an album whose ID value matches the parameter.
+	for _, a := range albums {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a) // serialize that album struct to JSON
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }

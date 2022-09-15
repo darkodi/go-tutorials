@@ -26,6 +26,8 @@ func main() {
 	// this sets up an association in which getAlbums handles requests to the /albums endpoint path.
 	// in other words, use the GET function to associate the GET HTTP method and /albums path with a handler function.
 	router.GET("/albums", getAlbums)
+	// Associate the POST method at the /albums path with the postAlbums function.
+	router.POST("/albums", postAlbums)
 	// attach the router to an http.Server and start the server.
 	router.Run("localhost:8080")
 }
@@ -33,4 +35,19 @@ func main() {
 // getAlbums responds with the list of all albums as JSON.
 func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums) //  serialize the struct into JSON and add it to the response.
+}
+
+// postAlbums adds an album from JSON received in the request body.
+func postAlbums(c *gin.Context) {
+	var newAlbum album
+
+	// Call BindJSON to bind the received JSON (request body) to newAlbum.
+	if err := c.BindJSON(&newAlbum); err != nil {
+		return
+	}
+
+	// Add the new album to the slice.
+	albums = append(albums, newAlbum)
+	// Add a 201 status code to the response, along with JSON representing the album you added.
+	c.IndentedJSON(http.StatusCreated, newAlbum)
 }

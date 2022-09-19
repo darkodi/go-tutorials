@@ -2,6 +2,11 @@ package main
 
 import "fmt"
 
+// type constraint
+type Number interface {
+	int64 | float64
+}
+
 func main() {
 	// Initialize a map for the integer values
 	ints := map[string]int64{
@@ -26,6 +31,10 @@ func main() {
 	fmt.Printf("Generic Sums, type parameters inferred: %v and %v\n",
 		SumIntsOrFloats(ints),
 		SumIntsOrFloats(floats))
+
+	fmt.Printf("Generic Sums with Constraint: %v and %v\n",
+		SumNumbers(ints),
+		SumNumbers(floats))
 }
 
 // SumInts adds together the values of m.
@@ -51,6 +60,15 @@ func SumFloats(m map[string]float64) float64 {
 // Specify for the K type parameter the type constraint comparable
 // Go requires that map keys be comparable.
 func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
+	var s V
+	for _, v := range m {
+		s += v
+	}
+	return s
+}
+
+// with the new interface Number type instead of the union as the type constraint
+func SumNumbers[K comparable, V Number](m map[K]V) V {
 	var s V
 	for _, v := range m {
 		s += v

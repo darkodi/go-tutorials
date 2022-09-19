@@ -22,19 +22,42 @@ import (
 // }
 
 // When fuzzing, you can’t predict the expected output, since you don’t have control over the inputs.
+// func FuzzReverse(f *testing.F) {
+// 	testcases := []string{"Hello, world", " ", "!12345"}
+// 	for _, tc := range testcases {
+// 		f.Add(tc) // Use f.Add to provide a seed corpus
+// 	}
+// 	f.Fuzz(func(t *testing.T, orig string) {
+// 		rev := Reverse(orig)
+// 		doubleRev := Reverse(rev)
+// 		// Reversing a string twice preserves the original value
+// 		if orig != doubleRev {
+// 			t.Errorf("Before: %q, after: %q", orig, doubleRev)
+// 		}
+// 		// The reversed string preserves its state as valid UTF-8.
+// 		if utf8.ValidString(orig) && !utf8.ValidString(rev) {
+// 			t.Errorf("Reverse produced invalid UTF-8 string %q", rev)
+// 		}
+// 	})
+// }
+
 func FuzzReverse(f *testing.F) {
 	testcases := []string{"Hello, world", " ", "!12345"}
 	for _, tc := range testcases {
 		f.Add(tc) // Use f.Add to provide a seed corpus
 	}
 	f.Fuzz(func(t *testing.T, orig string) {
-		rev := Reverse(orig)
-		doubleRev := Reverse(rev)
-		// Reversing a string twice preserves the original value
+		rev, err1 := Reverse2(orig)
+		if err1 != nil {
+			return
+		}
+		doubleRev, err2 := Reverse2(rev)
+		if err2 != nil {
+			return
+		}
 		if orig != doubleRev {
 			t.Errorf("Before: %q, after: %q", orig, doubleRev)
 		}
-		// The reversed string preserves its state as valid UTF-8.
 		if utf8.ValidString(orig) && !utf8.ValidString(rev) {
 			t.Errorf("Reverse produced invalid UTF-8 string %q", rev)
 		}
